@@ -2,4 +2,4 @@
 config/
 
 # いらないやつ
-.DS_Store
+*.DS_Store
