@@ -20,7 +20,7 @@ node.js
 - [confu](https://www.npmjs.com/package/confu)  
 bot の CK/CS を読み込むのに使用  
 (ハードコーディングしたままなのに気付かなくてコミット消したりリポジトリ消したりてんやわんやでした。反省)
-- [node-cron](https://www.npmjs.com/package/node-cron)  
+- [cron](https://github.com/kelektiv/node-cron)  
 定期実行用
 - [pm2](https://www.npmjs.com/package/pm2)  
 実行プロセスのデーモン化に使用  
