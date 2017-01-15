@@ -1,8 +1,8 @@
 var f = require('./chk_update.js');
-let cron = require('node-cron'); 
+let CronJob = require('cron').CronJob; 
 
-cron.schedule('0,10,20,30,40,50 * * * * *', () => {
+new CronJob('0-5,30-35 * * * * *', function() {
     var ctime = Date();
     console.log(ctime);
     f.func();
-});
+}, null, true, "Asia/Tokyo");
