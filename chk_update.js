@@ -85,15 +85,15 @@ exports.func = function () {
             // 更新確認
             var flg = false;
             if (news_arr[0] != update[1]) {
-                tweetUpdate(update[0], update[2]);
+                tweetUpdate('【モバアル】', update[0], update[2]);
                 flg = true;
             }
             if (news_arr[1] != news[1]) {
-                tweetUpdate(news[0], news[2]);
+                tweetUpdate('【ニュース】', news[0], news[2]);
                 flg = true;
             }
             if (news_arr[2] != academy[1]) {
-                tweetUpdate(academy[0], academy[2]);
+                tweetUpdate('【アカデミー】', academy[0], academy[2]);
                 flg = true;
             }
 
@@ -133,11 +133,12 @@ function readTextAsList(path) {
 
 /**
  * ツイートする
+ * @input  head カテゴリ
  * @input  text 記事タイトル(整形後)
  * @input  link 記事リンク
  */
-function tweetUpdate(text, link) {
-    var tweet_body = '【モバアル更新情報】\n' + text + '\n' + '#albirex\n' + link;
+function tweetUpdate(head, text, link) {
+    var tweet_body = head + '\n' + text + '\n' + '#albirex\n' + link;
 
     bot.post(
         'statuses/update',
