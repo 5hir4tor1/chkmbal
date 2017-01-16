@@ -101,7 +101,7 @@ exports.func = function () {
                 var text = update[1] + '\n' + news[1] + '\n' + academy[1];
                 fs.writeFileSync('news_log.txt', text, function (err) {
                     if(!err)
-                        console.log('Log update succeeded.')
+                        console.log('Log update succeeded.');
                     else {
                         console.log('Log update failed.');
                         console.log(err);
