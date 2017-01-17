@@ -12,7 +12,7 @@ var finish_update = '0:00 - 本日のモバアル更新確認を終了します�
 new CronJob('0 0-55/5 8-23 * * *', function() {
     var ctime = Date();
     console.log('\n=== ' + ctime + ' ===');
-    f.func();
+    cu.func();
     console.log();
 }, null, true, "Asia/Tokyo");
 
