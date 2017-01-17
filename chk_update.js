@@ -58,9 +58,9 @@ exports.func = function () {
 
             // スラッシュが入ってる時だけ整形
             if (update[0].match(/\//)) {
-                var tmp = update[0];
-                update[0] = tmp.split('/')[0] + '「' + tmp.split('/ ')[1] + '」';
-                update[1] = tmp;
+                update[1] = update[0];
+                var tmp = update[0].split('/');
+                update[0] = tmp[0] + '「' + tmp[1].trim() + '」';
             } else {
                 update[1] = update[0];
             }
@@ -144,8 +144,8 @@ function tweetUpdate(head, text, link) {
         'statuses/update',
         { status: tweet_body },
         function (err, tweet, response) {
+            console.log(tweet_body);
             if (!err) {
-                console.log(tweet_body)
                 console.log('Tweet succeeded.');
             } else {
                 console.log('Tweet failed.');
