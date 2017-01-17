@@ -122,7 +122,7 @@ exports.func = function () {
 
 /**
  * テキストファイルを各行の配列の形式で読み込む
- * @input  path テキストファイルのパス
+ * @param  path テキストファイルのパス
  * @return array
  */
 function readTextAsList(path) {
@@ -133,9 +133,9 @@ function readTextAsList(path) {
 
 /**
  * ツイートする
- * @input  head カテゴリ
- * @input  text 記事タイトル(整形後)
- * @input  link 記事リンク
+ * @param  head カテゴリ
+ * @param  text 記事タイトル(整形後)
+ * @param  link 記事リンク
  */
 function tweetUpdate(head, text, link) {
     var tweet_body = head + '\n' + text + '\n' + '#albirex\n' + link;
@@ -144,9 +144,10 @@ function tweetUpdate(head, text, link) {
         'statuses/update',
         { status: tweet_body },
         function (err, tweet, response) {
-            if (!err)
+            if (!err) {
+                console.log(tweet_body)
                 console.log('Tweet succeeded.');
-            else {
+            } else {
                 console.log('Tweet failed.');
                 console.log(err);
             }
