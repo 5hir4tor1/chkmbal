@@ -1,10 +1,4 @@
 # chkmbal / Check Mobile Albirex Update
-## Update
-### 2017-1-17
-- 更新確認の間隔を10分から5分に変更
-- モバアルコンテンツ以外の新着ニュース・アカデミーニュースの更新に対応
-- 定期ツイートの追加 (14, 18, 22時)
-- 更新開始時 (8時) と終了時 (24時) のツイートを追加
 
 ## これなに
 自分がいつも[モバイルアルビレックス](http://www.albirex.co.jp/info/mobile.html)の更新を見落とすので作りました。  
@@ -27,6 +21,8 @@ node.js
 - [confu](https://www.npmjs.com/package/confu)  
 bot の CK/CS を読み込むのに使用  
 (ハードコーディングしたままなのに気付かなくてコミット消したりリポジトリ消したりてんやわんやでした。反省)
+- [async](https://www.npmjs.com/package/async)  
+更新確認時の同期処理用
 - [cron](https://github.com/kelektiv/node-cron)  
 定期実行用
 - [pm2](https://www.npmjs.com/package/pm2)  

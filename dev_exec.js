@@ -1,6 +1,6 @@
-/* 定期起動用(5分毎発火)) */
+/* テスト用(10秒毎発火)) */
 
-var cu = require('./chk_update.js');
+var cu = require('./dev_chk_update.js');
 var rt = require('./regularly_tweet.js');
 let CronJob = require('cron').CronJob; 
 
