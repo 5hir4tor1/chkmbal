@@ -1,8 +1,0 @@
-# 設定をパブリックにしない
-config/
-
-# いらないやつ
-.DS_Store
-.gitignore
-.gitconfig
-node_modules/
