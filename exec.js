@@ -9,27 +9,27 @@ var start_update  = '本日のモバアル更新確認を開始します。';
 var finish_update = '本日のモバアル更新確認を終了します。終了後に更新があった場合は再開時にまとめてツイートします。';
 
 // check update
-new CronJob('0 0-55/5 0-2,9-23 * * *', function() {
+new CronJob('0 0-55/5 8-23 * * *', function() {
     var ctime = Date();
     console.log('\n=== ' + ctime + ' ===');
     cu.func();
 }, null, true, "Asia/Tokyo");
 
 // regularly tweet
-new CronJob('0 0 14,18,22 * * *', function() {
+new CronJob('0 0 14,16,18,20,22 * * *', function() {
     var ctime = Date();
     var hour  = new Date().getHours();
     rt.func(reg_tweet);
 }, null, true, "Asia/Tokyo");
 
 // start update
-new CronJob('0 0 9 * * *', function() {
+new CronJob('0 0 8 * * *', function() {
     var ctime = Date();
     rt.func(start_update);
 }, null, true, "Asia/Tokyo");
 
 // finish update
-new CronJob('0 0 3 * * *', function() {
+new CronJob('0 0 0 * * *', function() {
     var ctime = Date();
     rt.func(finish_update);
 }, null, true, "Asia/Tokyo");

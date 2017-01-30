@@ -12,8 +12,7 @@
 
 ## 使ってるもの
 
-node.js
-
+node.js (v7.4.0 で動作します)  
 - [cheerio-httpcli](https://www.npmjs.com/package/cheerio-httpcli)  
 モバアルのHTTPソースを取ってくるのに使用
 - [twitter](https://www.npmjs.com/package/twitter)  
@@ -32,8 +31,11 @@ AWS EC2
 - 自前のインスタンスで動いてます
 
 ## 問題点
-- 記事単体のURLが取得できない  
+- 記事単体のURL取得できないんですか  
 各携帯キャリアの会員認証が必要なので無理っぽいです。
+- 新着記事があるのにツイートされてないんですけど  
+トップページの新着記事一覧を見て判断してるのでこっちが更新されないと検知できない仕様です。  
+(各コンテンツの記事一覧ページは認証の向こう)
 
 ## なにかあったら
 [@albNo273](https://twitter.com/albNo273) までご連絡ください。

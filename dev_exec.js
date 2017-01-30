@@ -4,9 +4,9 @@ var cu = require('./dev_chk_update.js');
 var rt = require('./regularly_tweet.js');
 let CronJob = require('cron').CronJob; 
 
-var reg_tweet     = ':00 -【定期】本アカウントはモバイルアルビレックスのコンテンツ・ニュース更新を確認しツイートする非公式のbotです。詳細は固定ツイートをご参照ください。\n#albirex';
-var start_update  = '8:00 - 本日のモバアル更新確認を開始します。';
-var finish_update = '0:00 - 本日のモバアル更新確認を終了します。終了後に更新があった場合は翌日8:00にまとめてツイートします。';
+var reg_tweet     = '【定期】本アカウントはモバイルアルビレックスのコンテンツ・ニュース更新を確認しツイートする非公式のbotです。詳細は固定ツイートをご参照ください。\n#albirex';
+var start_update  = '本日のモバアル更新確認を開始します。';
+var finish_update = '本日のモバアル更新確認を終了します。終了後に更新があった場合は翌日8:00にまとめてツイートします。';
 
 // check update
 new CronJob('0-50/10 * * * * *', function() {
