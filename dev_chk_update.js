@@ -6,6 +6,7 @@ var confu = require('confu');
 var fs = require('fs');
 var async = require('async');
 
+// HTML スクレイピング先
 var url_sp = 'http://www.albirex.co.jp/sp/';
 var url_pd = 'http://www.albirex.co.jp/news/photo_diary';
 
@@ -49,7 +50,7 @@ exports.func = function () {
     // 更新の有無
     var flg = false;
 
-    // 直列処理
+    // 順番に処理
     async.waterfall([
         readRecentTitle,
         checkUpdateSPSite,
@@ -68,11 +69,6 @@ exports.func = function () {
             var text = fs.readFileSync('news_log.txt', { encoding: "utf8" });
             // \r を除去し、\n で配列に分割
             title_arr = text.replace(/\r/g, "").split("\n");
-            /*
-            for (var i = 0; i < title_arr.length; i++) {
-                console.log(title_arr[i]);
-            }
-            */
             console.log('Recent titles loaded.');
             callback(null);
         }, 1000);
@@ -120,28 +116,28 @@ exports.func = function () {
                     console.log('beat-recent:    ' + title_arr[0]);
                     console.log('beat-result:    ' + beat[0]);
                     if (title_arr[0] != beat[0]) {
-                        // tweetUpdate('【アルビの鼓動】', beat[0], beat[1]);
+                        // tweetUpdate('アルビの鼓動', beat);
                         flg = true;
                     }
 
                     console.log('staff-recent:   ' + title_arr[1]);
                     console.log('staff-result:   ' + staff[0]);
                     if (title_arr[1] != staff[0]) {
-                        // tweetUpdate('【広報ダイアリー】', staff[0], staff[1]);
+                        // tweetUpdate('広報ダイアリー', staff);
                         flg = true;
                     }
 
                     console.log('news-recent:    ' + title_arr[2]);
                     console.log('news-result:    ' + news[0]);
                     if (title_arr[2] != news[0]) {
-                        // tweetUpdate('【ニュース】', news[0], news[1]);
+                        // tweetUpdate('ニュース', news);
                         flg = true;
                     }
 
                     console.log('academy-recent: ' + title_arr[3]);
                     console.log('academy-result: ' + academy[0]);
                     if (title_arr[3] != academy[0]) {
-                        // tweetUpdate('【アカデミー】', academy[0], academy[1]);
+                        // tweetUpdate('アカデミー', academy);
                         flg = true;
                     }
                 } else {
@@ -167,7 +163,7 @@ exports.func = function () {
                     console.log('photo-recent:   ' + title_arr[4]);
                     console.log('photo-result:   ' + photo[0]);
                     if (title_arr[4] != photo[0]) {
-                        // tweetUpdate('【フォトダイアリー】', photo[0], photo[1]);
+                        // tweetUpdate('フォトダイアリー', photo);
                         flg = true;
                     }
                 } else {
@@ -204,13 +200,13 @@ exports.func = function () {
 
 /**
  * ツイートする
- * @param  head カテゴリ
- * @param  text 記事タイトル(整形後)
- * @param  link 記事リンク
+ * @param head カテゴリ
+ * @param data ツイートの中身
  */
-function tweetUpdate(head, text, link) {
+function tweetUpdate(head, data) {
 
-    var tweet_body = head + text + '\n' + link + '\n#albirex';
+    var tweet_body = '【' + head + '】'
+        + data[0] + '\n' + data[1] + '\n#albirex';
     console.log(tweet_body);
 
     bot.post(

@@ -4,7 +4,7 @@ var cu = require('./chk_update.js');
 var rt = require('./regularly_tweet.js');
 let CronJob = require('cron').CronJob; 
 
-var reg_tweet     = '【定期】本アカウントはモバイルアルビレックスのコンテンツ・ニュース更新を確認しツイートする非公式のbotです。詳細は固定ツイートをご参照ください。\n#albirex';
+var reg_tweet     = ':00 -【定期】本アカウントはモバイルアルビレックスのコンテンツ・ニュース更新を確認しツイートする非公式のbotです。詳細は固定ツイートをご参照ください。\n#albirex';
 var start_update  = '本日のモバアル更新確認を開始します。';
 var finish_update = '本日のモバアル更新確認を終了します。終了後に更新があった場合は再開時にまとめてツイートします。';
 
@@ -16,10 +16,10 @@ new CronJob('0 0-55/5 8-23 * * *', function() {
 }, null, true, "Asia/Tokyo");
 
 // regularly tweet
-new CronJob('0 0 14,16,18,20,22 * * *', function() {
+new CronJob('0 0 12-21/3 * * *', function() {
     var ctime = Date();
     var hour  = new Date().getHours();
-    rt.func(reg_tweet);
+    rt.func(hour + reg_tweet);
 }, null, true, "Asia/Tokyo");
 
 // start update
