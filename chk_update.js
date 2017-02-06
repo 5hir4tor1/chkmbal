@@ -6,6 +6,7 @@ var confu = require('confu');
 var fs = require('fs');
 var async = require('async');
 
+// HTML スクレイピング先
 var url_sp = 'http://www.albirex.co.jp/sp/';
 var url_pd = 'http://www.albirex.co.jp/news/photo_diary';
 
@@ -49,168 +50,157 @@ exports.func = function () {
     // 更新の有無
     var flg = false;
 
-    // 直列処理
-    async.waterfall([
-        readRecentTitle,
-        checkUpdateSPSite,
-        checkUpdatePhotoDiary,
-        updateLog,
-    ], function (err) {
-        if (err)
-            throw err;
-        else
-            console.log('All processing is completed.');
-    });
+    Promise.resolve()
+        // 1. 直近の記事タイトルを読み込む
+        .then(function () {
+            return new Promise(function (resolve, reject) {
+                var text = fs.readFileSync('news_log.txt', { encoding: "utf8" });
+                // \r を除去し、\n で配列に分割
+                title_arr = text.replace(/\r/g, "").split("\n");
+                console.log('Recent titles loaded.');
+                resolve(null);
+            });
+        })
+        // 2. SP サイトの更新確認とツイート
+        .then(function (value) {
+            return new Promise(function (resolve, reject) {
+                client.fetch(url_sp, function (err, $, res, body) {
+                    if (!err) {
+                        // console.log($('.news').html());
 
-    // 1. 直近の記事タイトルを読み込む
-    function readRecentTitle(callback) {
-        setTimeout(function () {
-            var text = fs.readFileSync('news_log.txt', { encoding: "utf8" });
-            // \r を除去し、\n で配列に分割
-            title_arr = text.replace(/\r/g, "").split("\n");
-            /*
-            for (var i = 0; i < title_arr.length; i++) {
-                console.log(title_arr[i]);
-            }
-            */
-            console.log('Recent titles loaded.');
-            callback(null);
-        }, 1000);
-    }
+                        // (i) 記事タイトル(生)
+                        var mbal_arr = $('.news').eq(0).find('a');
+                        var beat_newest, staff_newest;
+                        var pos_b, pos_s; // 2記事の位置
 
-    // 2. SP サイトの更新確認とツイート
-    function checkUpdateSPSite(callback) {
-        setTimeout(function () {
-            client.fetch(url_sp, function (err, $, res, body) {
-                if (!err) {
-                    // console.log($('.news').html());
-
-                    // (i) 記事タイトル(生)
-                    var mbal_arr = $('.news').eq(0).find('a');
-                    var beat_newest, staff_newest;
-                    var pos_b, pos_s; // 2記事の位置
-
-                    // アルビの鼓動と広報ダイアリーの位置探し
-                    for (var i = 0, l = mbal_arr.length; i < l; i++) {
-                        var title = mbal_arr.eq(i).text();
-                        if (title.match(/アルビの鼓動/)) {
-                            beat_newest = title;
-                            pos_b = i;
-                        } else if (title.match(/広報ダイアリー/)) {
-                            staff_newest = title;
-                            pos_s = i;
+                        // アルビの鼓動と広報ダイアリーの位置探し
+                        for (var i = 0, l = mbal_arr.length; i < l; i++) {
+                            var title = mbal_arr.eq(i).text();
+                            if (title.match(/アルビの鼓動/)) {
+                                beat_newest = title;
+                                pos_b = i;
+                            } else if (title.match(/広報ダイアリー/)) {
+                                staff_newest = title;
+                                pos_s = i;
+                            }
                         }
-                    }
 
-                    var news_newest = $('.news').eq(1).find('a').eq(0).text();
-                    var academy_newest = $('.news').eq(2).find('a').eq(0).text();
+                        var news_newest = $('.news').eq(1).find('a').eq(0).text();
+                        var academy_newest = $('.news').eq(2).find('a').eq(0).text();
 
-                    beat[0] = beat_newest.replace(/^.*\//g, '').trim();
-                    staff[0] = staff_newest.replace(/^.*\//g, '').trim();
-                    news[0] = news_newest.slice(11);
-                    academy[0] = academy_newest.slice(11);
+                        beat[0] = beat_newest.replace(/^.*\//g, '').trim();
+                        staff[0] = staff_newest.replace(/^.*\//g, '').trim();
+                        news[0] = news_newest.slice(11);
+                        academy[0] = academy_newest.slice(11);
 
-                    // (ii) URL
-                    beat[1] = $('.news').eq(0).find('a').url()[pos_b];
-                    staff[1] = $('.news').eq(0).find('a').url()[pos_s];
-                    news[1] = $('.news').eq(1).find('a').url()[0];
-                    academy[1] = $('.news').eq(2).find('a').url()[0];
+                        // (ii) URL
+                        beat[1] = $('.news').eq(0).find('a').url()[pos_b];
+                        staff[1] = $('.news').eq(0).find('a').url()[pos_s];
+                        news[1] = $('.news').eq(1).find('a').url()[0];
+                        academy[1] = $('.news').eq(2).find('a').url()[0];
 
-                    // 更新確認したらツイート
-                    console.log('beat-recent:    ' + title_arr[0]);
-                    console.log('beat-result:    ' + beat[0]);
-                    if (title_arr[0] != beat[0]) {
-                        tweetUpdate('【アルビの鼓動】', beat[0], beat[1]);
-                        flg = true;
-                    }
+                        // 更新確認したらツイート
+                        console.log('beat-recent:    ' + title_arr[0]);
+                        console.log('beat-result:    ' + beat[0]);
+                        if (title_arr[0] != beat[0]) {
+                            tweetUpdate('アルビの鼓動', beat);
+                            flg = true;
+                        }
 
-                    console.log('staff-recent:   ' + title_arr[1]);
-                    console.log('staff-result:   ' + staff[0]);
-                    if (title_arr[1] != staff[0]) {
-                        tweetUpdate('【広報ダイアリー】', staff[0], staff[1]);
-                        flg = true;
-                    }
+                        console.log('staff-recent:   ' + title_arr[1]);
+                        console.log('staff-result:   ' + staff[0]);
+                        if (title_arr[1] != staff[0]) {
+                            tweetUpdate('広報ダイアリー', staff);
+                            flg = true;
+                        }
 
-                    console.log('news-recent:    ' + title_arr[2]);
-                    console.log('news-result:    ' + news[0]);
-                    if (title_arr[2] != news[0]) {
-                        tweetUpdate('【ニュース】', news[0], news[1]);
-                        flg = true;
-                    }
+                        console.log('news-recent:    ' + title_arr[2]);
+                        console.log('news-result:    ' + news[0]);
+                        if (title_arr[2] != news[0]) {
+                            tweetUpdate('ニュース', news);
+                            flg = true;
+                        }
 
-                    console.log('academy-recent: ' + title_arr[3]);
-                    console.log('academy-result: ' + academy[0]);
-                    if (title_arr[3] != academy[0]) {
-                        tweetUpdate('【アカデミー】', academy[0], academy[1]);
-                        flg = true;
-                    }
-                } else {
-                    console.log('FATAL ERROR!!')
-                    console.log(err);
-                }
-            });
-            callback(null);
-        }, 1000);
-    }
+                        console.log('academy-recent: ' + title_arr[3]);
+                        console.log('academy-result: ' + academy[0]);
+                        if (title_arr[3] != academy[0]) {
+                            tweetUpdate('アカデミー', academy);
+                            flg = true;
+                        }
 
-    // 3. PC サイト - フォトダイアリーの更新確認とツイート
-    function checkUpdatePhotoDiary(callback) {
-        setTimeout(function () {
-            client.fetch(url_pd, function (err, $, res, body) {
-                if (!err) {
-                    // console.log($.html());
-
-                    photo[0] = $('.second-news-area').eq(0).find('a').eq(0).text();
-                    photo[1] = $('.second-news-area').eq(0).find('a').url()[1];
-
-                    // 更新確認したらツイート
-                    console.log('photo-recent:   ' + title_arr[4]);
-                    console.log('photo-result:   ' + photo[0]);
-                    if (title_arr[4] != photo[0]) {
-                        tweetUpdate('【フォトダイアリー】', photo[0], photo[1]);
-                        flg = true;
-                    }
-                } else {
-                    console.log('FATAL ERROR!!')
-                    console.log(err);
-                }
-            });
-            callback(null);
-        }, 1000);
-    }
-
-    // 4. 記事タイトルログの更新
-    function updateLog(callback) {
-        setTimeout(function () {
-            if (flg) {
-                var text = beat[0] + '\n' + staff[0] + '\n'
-                    + news[0] + '\n' + academy[0] + '\n' + photo[0];
-                fs.writeFileSync('news_log.txt', text, function (err) {
-                    if (!err)
-                        console.log('Log update succeeded.');
-                    else {
-                        console.log('Log update failed.');
+                        resolve(null);
+                    } else {
+                        console.log('FATAL ERROR!!')
                         console.log(err);
                     }
                 });
-            } else {
-                console.log('Log is not updated.');
-            }
-            callback(null);
-        }, 1000);
-    }
+            });
+        })
+        // 3. PC サイト - フォトダイアリーの更新確認とツイート
+        .then(function (value) {
+            return new Promise(function (resolve, reject) {
+                client.fetch(url_pd, function (err, $, res, body) {
+                    if (!err) {
+                        // console.log($.html());
 
+                        photo[0] = $('.second-news-area').eq(0).find('a').eq(0).text();
+                        photo[1] = $('.second-news-area').eq(0).find('a').url()[1];
+
+                        // 更新確認したらツイート
+                        console.log('photo-recent:   ' + title_arr[4]);
+                        console.log('photo-result:   ' + photo[0]);
+                        if (title_arr[4] != photo[0]) {
+                            tweetUpdate('フォトダイアリー', photo);
+                            flg = true;
+                        }
+
+                        resolve(null);
+                    } else {
+                        console.log('FATAL ERROR!!')
+                        console.log(err);
+                    }
+                });
+            });
+        })
+        // 4. 記事タイトルログの更新
+        .then(function (value) {
+            return new Promise(function (resolve, reject) {
+                if (flg) {
+                    var text = beat[0] + '\n' + staff[0] + '\n'
+                        + news[0] + '\n' + academy[0] + '\n' + photo[0];
+                    fs.writeFileSync('news_log.txt', text, function (err) {
+                        if (!err)
+                            console.log('Log update succeeded.');
+                        else {
+                            console.log('Log update failed.');
+                            console.log(err);
+                        }
+                    });
+
+                    resolve(null);
+                } else {
+                    console.log('Log is not updated.');
+                    resolve(null);
+                }
+            });
+        })
+        .then(function (value) {
+            console.log('All processing is done.');
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
 }
 
 /**
  * ツイートする
- * @param  head カテゴリ
- * @param  text 記事タイトル(整形後)
- * @param  link 記事リンク
+ * @param head カテゴリ
+ * @param data ツイートの中身
  */
-function tweetUpdate(head, text, link) {
+function tweetUpdate(head, data) {
 
-    var tweet_body = head + text + '\n' + link + '\n#albirex';
+    var tweet_body = '【' + head + '】'
+        + data[0] + '\n' + data[1] + '\n#albirex';
     console.log(tweet_body);
 
     bot.post(
