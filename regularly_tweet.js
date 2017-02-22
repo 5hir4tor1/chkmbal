@@ -1,14 +1,14 @@
 /* 定期ツイート用 */
 
-var twitter = require('twitter');
-var confu = require('confu');
+const twitter = require('twitter'),
+      confu = require('confu');
 
 // bot の CK/CS 読み込み
-var conf = confu('.', 'config', 'key.json');
+const conf = confu('.', 'config', 'key.json');
 // console.log(conf);
 
 // token 設定
-var bot = new twitter({
+const bot = new twitter({
     consumer_key: conf.key.cons_key,
     consumer_secret: conf.key.cons_sec,
     access_token_key: conf.key.acc_token,

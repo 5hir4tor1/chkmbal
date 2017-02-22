@@ -20,8 +20,6 @@ node.js (v7.4.0 で動作します)
 - [confu](https://www.npmjs.com/package/confu)  
 bot の CK/CS を読み込むのに使用  
 (ハードコーディングしたままなのに気付かなくてコミット消したりリポジトリ消したりてんやわんやでした。反省)
-- [async](https://www.npmjs.com/package/async)  
-更新確認時の同期処理用
 - [cron](https://github.com/kelektiv/node-cron)  
 定期実行用
 - [pm2](https://www.npmjs.com/package/pm2)  

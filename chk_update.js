@@ -1,21 +1,20 @@
 /* モバアル更新チェック */
 
-var client = require('cheerio-httpcli');
-var twitter = require('twitter');
-var confu = require('confu');
-var fs = require('fs');
-var async = require('async');
+const client = require('cheerio-httpcli'),
+      twitter = require('twitter'),
+      confu = require('confu'),
+      fs = require('fs');
 
 // HTML スクレイピング先
-var url_sp = 'http://www.albirex.co.jp/sp/';
-var url_pd = 'http://www.albirex.co.jp/news/photo_diary';
+const url_sp = 'http://www.albirex.co.jp/sp/',
+      url_pd = 'http://www.albirex.co.jp/news/photo_diary';
 
 // bot の CK/CS 読み込み
-var conf = confu('.', 'config', 'key.json');
+const conf = confu('.', 'config', 'key.json');
 // console.log(conf);
 
 // token 設定
-var bot = new twitter({
+const bot = new twitter({
     consumer_key: conf.key.cons_key,
     consumer_secret: conf.key.cons_sec,
     access_token_key: conf.key.acc_token,
@@ -34,27 +33,27 @@ exports.func = function () {
      * [3]: アカデミーニュース academy    
      * [4]: フォトダイアリー   photo
      */
-    var title_arr = new Array(5);
+    let title_arr = new Array(5);
 
     /**
      * 確認時の記事タイトルとリンクを格納
      * [0]: 記事タイトル(整形後)
      * [1]: 記事リンク
      */
-    var beat = new Array(2);    // アルビの鼓動
-    var staff = new Array(2);   // 広報ダイアリー
-    var news = new Array(2);    // 新着ニュース
-    var academy = new Array(2); // アカデミーニュース
-    var photo = new Array(2);   // フォトダイアリー
+    let beat = new Array(2),    // アルビの鼓動
+        staff = new Array(2),   // 広報ダイアリー
+        news = new Array(2),    // 新着ニュース
+        academy = new Array(2), // アカデミーニュース
+        photo = new Array(2);   // フォトダイアリー
 
     // 更新の有無
-    var flg = false;
+    let flg = false;
 
     Promise.resolve()
         // 1. 直近の記事タイトルを読み込む
         .then(function () {
             return new Promise(function (resolve, reject) {
-                var text = fs.readFileSync('news_log.txt', { encoding: "utf8" });
+                const text = fs.readFileSync('news_log.txt', { encoding: "utf8" });
                 // \r を除去し、\n で配列に分割
                 title_arr = text.replace(/\r/g, "").split("\n");
                 console.log('Recent titles loaded.');
@@ -69,24 +68,24 @@ exports.func = function () {
                         // console.log($('.news').html());
 
                         // (i) 記事タイトル(生)
-                        var mbal_arr = $('.news').eq(0).find('a');
-                        var beat_newest, staff_newest;
-                        var pos_b, pos_s; // 2記事の位置
+                        const mbal_arr = $('.news').eq(0).find('a');
+                        let beat_newest, staff_newest;
+                        let pos_b, pos_s; // 2記事の位置
 
                         // アルビの鼓動と広報ダイアリーの位置探し
-                        for (var i = 0, l = mbal_arr.length; i < l; i++) {
-                            var title = mbal_arr.eq(i).text();
-                            if (title.match(/アルビの鼓動/)) {
+                        for (let i = 0, l = mbal_arr.length; i < l; i++) {
+                            const title = mbal_arr.eq(i).text();
+                            if (title.includes('アルビの鼓動')) {
                                 beat_newest = title;
                                 pos_b = i;
-                            } else if (title.match(/広報ダイアリー/)) {
+                            } else if (title.includes('広報ダイアリー')) {
                                 staff_newest = title;
                                 pos_s = i;
                             }
                         }
 
-                        var news_newest = $('.news').eq(1).find('a').eq(0).text();
-                        var academy_newest = $('.news').eq(2).find('a').eq(0).text();
+                        const news_newest = $('.news').eq(1).find('a').eq(0).text();
+                        const academy_newest = $('.news').eq(2).find('a').eq(0).text();
 
                         beat[0] = beat_newest.replace(/^.*\//g, '').trim();
                         staff[0] = staff_newest.replace(/^.*\//g, '').trim();
@@ -166,8 +165,8 @@ exports.func = function () {
         .then(function (value) {
             return new Promise(function (resolve, reject) {
                 if (flg) {
-                    var text = beat[0] + '\n' + staff[0] + '\n'
-                        + news[0] + '\n' + academy[0] + '\n' + photo[0];
+                    const text = beat[0] + '\n' + staff[0] + '\n'
+                            + news[0] + '\n' + academy[0] + '\n' + photo[0];
                     fs.writeFileSync('news_log.txt', text, function (err) {
                         if (!err)
                             console.log('Log update succeeded.');
@@ -199,8 +198,8 @@ exports.func = function () {
  */
 function tweetUpdate(head, data) {
 
-    var tweet_body = '【' + head + '】'
-        + data[0] + '\n' + data[1] + '\n#albirex';
+    const tweet_body = '【' + head + '】'
+            + data[0] + '\n' + data[1] + '\n#albirex';
     console.log(tweet_body);
 
     bot.post(
