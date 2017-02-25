@@ -1,9 +1,9 @@
 /* モバアル更新チェック */
 
-const client = require('cheerio-httpcli'),
+const client  = require('cheerio-httpcli'),
       twitter = require('twitter'),
-      confu = require('confu'),
-      fs = require('fs');
+      confu   = require('confu'),
+      fs      = require('fs');
 
 // HTML スクレイピング先
 const url_sp = 'http://www.albirex.co.jp/sp/',
@@ -15,9 +15,9 @@ const conf = confu('.', 'config', 'key.json');
 
 // token 設定
 const bot = new twitter({
-    consumer_key: conf.key.cons_key,
-    consumer_secret: conf.key.cons_sec,
-    access_token_key: conf.key.acc_token,
+    consumer_key:        conf.key.cons_key,
+    consumer_secret:     conf.key.cons_sec,
+    access_token_key:    conf.key.acc_token,
     access_token_secret: conf.key.acc_token_sec
 });
 
@@ -32,6 +32,7 @@ exports.func = function () {
      * [2]: 新着ニュース       news
      * [3]: アカデミーニュース academy    
      * [4]: フォトダイアリー   photo
+     * [5]: コラム             column <- NEW!!
      */
     let title_arr = new Array(5);
 
@@ -40,11 +41,13 @@ exports.func = function () {
      * [0]: 記事タイトル(整形後)
      * [1]: 記事リンク
      */
-    let beat = new Array(2),    // アルビの鼓動
-        staff = new Array(2),   // 広報ダイアリー
-        news = new Array(2),    // 新着ニュース
+    let beat    = new Array(2), // アルビの鼓動
+        staff   = new Array(2), // 広報ダイアリー
+        news    = new Array(2), // 新着ニュース
         academy = new Array(2), // アカデミーニュース
-        photo = new Array(2);   // フォトダイアリー
+        photo   = new Array(2), // フォトダイアリー
+        column  = new Array(2);
+
 
     // 更新の有無
     let flg = false;
@@ -69,10 +72,10 @@ exports.func = function () {
 
                         // (i) 記事タイトル(生)
                         const mbal_arr = $('.news').eq(0).find('a');
-                        let beat_newest, staff_newest;
-                        let pos_b, pos_s; // 2記事の位置
+                        let beat_newest, staff_newest, column_newest;
+                        let pos_b, pos_s, pos_c; // 記事の位置
 
-                        // アルビの鼓動と広報ダイアリーの位置探し
+                        // アルビの鼓動と広報ダイアリーとコラムの位置探し
                         for (let i = 0, l = mbal_arr.length; i < l; i++) {
                             const title = mbal_arr.eq(i).text();
                             if (title.includes('アルビの鼓動')) {
@@ -81,22 +84,27 @@ exports.func = function () {
                             } else if (title.includes('広報ダイアリー')) {
                                 staff_newest = title;
                                 pos_s = i;
+                            } else if (title.includes('コラム')) {
+                                column_newest = title;
+                                pos_c = i;
                             }
                         }
 
                         const news_newest = $('.news').eq(1).find('a').eq(0).text();
                         const academy_newest = $('.news').eq(2).find('a').eq(0).text();
 
-                        beat[0] = beat_newest.replace(/^.*\//g, '').trim();
-                        staff[0] = staff_newest.replace(/^.*\//g, '').trim();
-                        news[0] = news_newest.slice(11);
+                        beat[0]    = beat_newest.replace(/^.*\//g, '').trim();
+                        staff[0]   = staff_newest.replace(/^.*\//g, '').trim();
+                        news[0]    = news_newest.slice(11);
                         academy[0] = academy_newest.slice(11);
+                        column[0]  = column_newest.replace(/^.*\//g, '').trim();
 
                         // (ii) URL
-                        beat[1] = $('.news').eq(0).find('a').url()[pos_b];
-                        staff[1] = $('.news').eq(0).find('a').url()[pos_s];
-                        news[1] = $('.news').eq(1).find('a').url()[0];
+                        beat[1]    = $('.news').eq(0).find('a').url()[pos_b];
+                        staff[1]   = $('.news').eq(0).find('a').url()[pos_s];
+                        news[1]    = $('.news').eq(1).find('a').url()[0];
                         academy[1] = $('.news').eq(2).find('a').url()[0];
+                        column[1]  = $('.news').eq(0).find('a').url()[pos_c];
 
                         // 更新確認したらツイート
                         console.log('beat-recent:    ' + title_arr[0]);
@@ -124,6 +132,13 @@ exports.func = function () {
                         console.log('academy-result: ' + academy[0]);
                         if (title_arr[3] != academy[0]) {
                             tweetUpdate('アカデミー', academy);
+                            flg = true;
+                        }
+
+                        console.log('column-recent:  ' + title_arr[5]);
+                        console.log('column-result:  ' + column[0]);
+                        if (title_arr[5] != column[0]) {
+                            tweetUpdate('コラム', column);
                             flg = true;
                         }
 
@@ -166,7 +181,8 @@ exports.func = function () {
             return new Promise(function (resolve, reject) {
                 if (flg) {
                     const text = beat[0] + '\n' + staff[0] + '\n'
-                            + news[0] + '\n' + academy[0] + '\n' + photo[0];
+                            + news[0] + '\n' + academy[0] + '\n' 
+                            + photo[0] + '\n' + column[0];
                     fs.writeFileSync('news_log.txt', text, function (err) {
                         if (!err)
                             console.log('Log update succeeded.');
