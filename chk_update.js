@@ -1,9 +1,9 @@
 /* モバアル更新チェック */
 
-const client = require('cheerio-httpcli'),
+const client  = require('cheerio-httpcli'),
       twitter = require('twitter'),
-      confu = require('confu'),
-      fs = require('fs');
+      confu   = require('confu'),
+      fs      = require('fs');
 
 // HTML スクレイピング先
 const url_sp = 'http://www.albirex.co.jp/sp/',
@@ -42,12 +42,12 @@ exports.func = function () {
      * [0]: 記事タイトル(整形後)
      * [1]: 記事リンク
      */
-    let beat = new Array(2), // アルビの鼓動
-        staff = new Array(2), // 広報ダイアリー
-        news = new Array(2), // 新着ニュース
+    let beat    = new Array(2), // アルビの鼓動
+        staff   = new Array(2), // 広報ダイアリー
+        news    = new Array(2), // 新着ニュース
         academy = new Array(2), // アカデミーニュース
-        photo = new Array(2), // フォトダイアリー
-        column = new Array(2);
+        photo   = new Array(2), // フォトダイアリー
+        column  = new Array(2); // コラム
 
 
     // 更新の有無
@@ -94,11 +94,11 @@ exports.func = function () {
                         var news_newest = $('.news > .category-detail > ul > li').eq(0);
                         var academy_newest = $('.academy-news > .category-detail > ul > li').eq(0);
 
-                        beat[0] = beat_newest.replace(/^.*\//g, '').trim();
-                        staff[0] = staff_newest.replace(/^.*\//g, '').trim();
+                        beat[0] = beat_newest.replace(/^.*\//g, '').split('/').trim();
+                        staff[0] = staff_newest.replace(/^.*\//g, '').split('/').trim();
                         news[0] = news_newest.find('span').text();
                         academy[0] = academy_newest.find('span').text();
-                        column[0] = column_newest.replace(/^.*\//g, '').trim();
+                        column[0] = column_newest.replace(/^.*\//g, '').split('/').trim();
 
                         // (ii) URL
                         beat[1] = $('.news').eq(0).find('a').url()[pos_b];
