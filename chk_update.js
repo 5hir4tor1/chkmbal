@@ -94,11 +94,11 @@ exports.func = function () {
                         var news_newest = $('.news > .category-detail > ul > li').eq(0);
                         var academy_newest = $('.academy-news > .category-detail > ul > li').eq(0);
 
-                        beat[0] = beat_newest.replace(/^.*\//g, '').split('/').trim();
-                        staff[0] = staff_newest.replace(/^.*\//g, '').split('/').trim();
+                        beat[0] = beat_newest.replace(/^.*\//g, '').split('/')[1].trim();
+                        staff[0] = staff_newest.replace(/^.*\//g, '').split('/')[1].trim();
                         news[0] = news_newest.find('span').text();
                         academy[0] = academy_newest.find('span').text();
-                        column[0] = column_newest.replace(/^.*\//g, '').split('/').trim();
+                        column[0] = column_newest.replace(/^.*\//g, '').split('/')[1].trim();
 
                         // (ii) URL
                         beat[1] = $('.news').eq(0).find('a').url()[pos_b];
